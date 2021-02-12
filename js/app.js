@@ -52,12 +52,29 @@ let totalExists = false;
 let total = 0;
 let next = 0;
 
+function calculator(e) {
+    if(e.target.value.match(/[0-9]/g)) {
+        numKey(e);
+    } else if (operationArr.includes(e.target.value)) {
+        opKey(e);
+    } else if (e.target.value == 'equals') {
+        equalsKey();
+    } else if (e.target.value == 'clear') {
+        clearKey();
+    }
+}
+
+
+
 function numKey(e) {
     if(refresh == true) {
         numArr = [];
     }
     refresh = false;
-    numArr.push(e.target.value);
+    // Hold upto 11 digits.
+    if (numArr.length < 11) {
+        numArr.push(e.target.value);
+    }
     const toDisplay = parseFloat(numArr.join(''));
     display.textContent = toDisplay;
 
@@ -86,11 +103,21 @@ function opKey(e) {
 function equalsKey() {
     if (totalExists && inOperation) {
         total = operate(operation, total, next);
+        // Round solution upto 2 decimal places.
+        total = Math.round(total * 100) / 100;
+
         next = 0;
         numArr = [];
-        console.log(`total: ${total}, next ${next}, ${numArr.join('')}`);       
+        operation = '';      
     }
-    display.textContent = total;
+
+    // Display solution of only upto 11 digits.
+    if (total.toString().length > 11) {
+        display.textContent = "Can't fit that here";
+    } else {
+        display.textContent = total;
+    }
+    
 }
 
 function clearKey() {
@@ -104,23 +131,3 @@ function clearKey() {
     display.textContent = 0;
 }
 
-function calculator(e) {
-    if(e.target.value.match(/[0-9]/g)) {
-        numKey(e);
-
-    } else if (operationArr.includes(e.target.value)) {
-        opKey(e);
-
-    } else if (e.target.value == 'equals') {
-        equalsKey();
-    } else if (e.target.value == 'clear') {
-        clearKey();
-    }
-}
-/* make a calculator function
--if number keys are hit
-    -if no operation keys are hit add digits to toDisplay
--if operation keys are hit
-    - if toDisplay is empty do nothing
-    - else register operation key adn empty
-*/
